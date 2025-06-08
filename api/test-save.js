@@ -107,10 +107,21 @@ function updateScriptWithEvent(scriptContent, dateString, eventData) {
         
         // Wyciągnij obecny obiekt events
         const eventsString = scriptContent.substring(eventsStart, eventsEnd);
-        const eventsCode = eventsString.replace('const events = ', '');
+        let eventsCode = eventsString.replace('const events = ', '');
+        
+        console.log('🔍 Cleaning events code for parsing...');
+        
+        // Bezpieczne parsowanie - konwertuj JavaScript na JSON
+        // Usuń trailing comma jeśli istnieje
+        eventsCode = eventsCode.replace(/,(\s*})/g, '$1');
+        
+        // Zamień single quotes na double quotes (dla JSON)
+        eventsCode = eventsCode.replace(/'/g, '"');
         
         console.log('🔍 Parsing events object...');
-        const events = eval('(' + eventsCode + ')');
+        console.log('Code to parse:', eventsCode.substring(0, 200) + '...');
+        
+        const events = JSON.parse(eventsCode);
         console.log('✅ Events parsed, current count:', Object.keys(events).length);
         
         // Dodaj nowe wydarzenie
@@ -130,6 +141,10 @@ function updateScriptWithEvent(scriptContent, dateString, eventData) {
         
     } catch (error) {
         console.error('❌ Błąd aktualizacji script.js:', error);
+        console.error('Error details:', {
+            message: error.message,
+            name: error.name
+        });
         throw error;
     }
 } 

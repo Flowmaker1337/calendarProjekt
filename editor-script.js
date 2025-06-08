@@ -264,7 +264,80 @@ function addExportButton() {
     document.querySelector('.existing-events').appendChild(exportBtn);
 }
 
-// Dodaj przycisk eksportu po załadowaniu
+// Debug upload functionality
+async function debugUpload() {
+    try {
+        const formData = new FormData(document.getElementById('addEventForm'));
+        const year = formData.get('year');
+        const month = formData.get('month').padStart(2, '0');
+        const day = formData.get('day').padStart(2, '0');
+        const title = formData.get('title');
+        const description = formData.get('description');
+        const file = formData.get('coverImage');
+        
+        const dateString = `${year}-${month}-${day}`;
+        
+        if (!file || file.size === 0) {
+            console.log('🐛 No file selected');
+            return;
+        }
+        
+        // Convert file to base64
+        const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+        
+        const requestData = {
+            date: dateString,
+            title: title,
+            description: description,
+            imageBase64: base64
+        };
+        
+        console.log('🐛 Sending debug request:', requestData);
+        
+        const response = await fetch('/api/debug-upload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        const result = await response.json();
+        console.log('🐛 Debug response:', result);
+        
+        if (response.ok) {
+            showMessage('Debug test completed - check console', 'success');
+        } else {
+            showMessage(`Debug error: ${result.error}`, 'error');
+        }
+        
+    } catch (error) {
+        console.error('🐛 Debug error:', error);
+        showMessage(`Debug failed: ${error.message}`, 'error');
+    }
+}
+
+// Dodaj przycisk debug
+function addDebugButton() {
+    const debugBtn = document.createElement('button');
+    debugBtn.textContent = '🐛 Debug Upload';
+    debugBtn.className = 'submit-btn';
+    debugBtn.type = 'button';
+    debugBtn.style.marginTop = '10px';
+    debugBtn.style.backgroundColor = '#ff6b6b';
+    debugBtn.onclick = debugUpload;
+    
+    document.querySelector('.existing-events').appendChild(debugBtn);
+}
+
+// Dodaj przyciski po załadowaniu
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(addExportButton, 1000);
+    setTimeout(() => {
+        addExportButton();
+        addDebugButton();
+    }, 1000);
 }); 

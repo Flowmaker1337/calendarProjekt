@@ -180,9 +180,28 @@ function setupForm() {
 // Wysłanie do GitHub (trwałe zapisywanie)
 async function uploadEventToGitHub(formData, dateString, title, description, file) {
     try {
-        const response = await fetch('/api/save-event', {
+        // Convert file to base64 for new endpoint
+        const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+        
+        const requestData = {
+            date: dateString,
+            title: title,
+            description: description,
+            imageBase64: base64
+        };
+        
+        console.log('📤 Sending to save-event-v2...');
+        
+        const response = await fetch('/api/save-event-v2', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
         });
         
         if (!response.ok) {
@@ -334,10 +353,81 @@ function addDebugButton() {
     document.querySelector('.existing-events').appendChild(debugBtn);
 }
 
+// Test nowego endpointa V2
+async function testV2Upload() {
+    try {
+        const formData = new FormData(document.getElementById('addEventForm'));
+        const year = formData.get('year');
+        const month = formData.get('month').padStart(2, '0');
+        const day = formData.get('day').padStart(2, '0');
+        const title = formData.get('title');
+        const description = formData.get('description');
+        const file = formData.get('coverImage');
+        
+        const dateString = `${year}-${month}-${day}`;
+        
+        if (!file || file.size === 0) {
+            console.log('🧪 No file selected');
+            return;
+        }
+        
+        // Convert file to base64
+        const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+        
+        const requestData = {
+            date: dateString,
+            title: title,
+            description: description,
+            imageBase64: base64
+        };
+        
+        console.log('🧪 Testing V2 endpoint:', requestData);
+        
+        const response = await fetch('/api/save-event-v2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        const result = await response.json();
+        console.log('🧪 V2 Response:', result);
+        
+        if (response.ok) {
+            showMessage('✅ V2 Test SUCCESS! Event saved!', 'success');
+        } else {
+            showMessage(`❌ V2 Test failed: ${result.error}`, 'error');
+        }
+        
+    } catch (error) {
+        console.error('🧪 V2 Test error:', error);
+        showMessage(`❌ V2 Test failed: ${error.message}`, 'error');
+    }
+}
+
+// Dodaj przycisk V2 test
+function addV2TestButton() {
+    const v2Btn = document.createElement('button');
+    v2Btn.textContent = '🧪 Test V2 Save';
+    v2Btn.className = 'submit-btn';
+    v2Btn.type = 'button';
+    v2Btn.style.marginTop = '10px';
+    v2Btn.style.backgroundColor = '#4CAF50';
+    v2Btn.onclick = testV2Upload;
+    
+    document.querySelector('.existing-events').appendChild(v2Btn);
+}
+
 // Dodaj przyciski po załadowaniu
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         addExportButton();
         addDebugButton();
+        addV2TestButton();
     }, 1000);
 }); 

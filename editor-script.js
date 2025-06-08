@@ -146,24 +146,58 @@ function setupForm() {
         btnLoading.style.display = 'inline';
         
         try {
-            // Wysłanie do GitHub via API
-            await uploadEventToGitHub(formData, dateString, title, description, file);
+            // Convert file to base64 for V2 endpoint
+            const base64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
             
-            // Dodanie do lokalnej listy
-            const fileName = `event-${Date.now()}-${file.name}`;
-            currentEvents[dateString] = {
+            const requestData = {
+                date: dateString,
                 title: title,
                 description: description,
-                coverImage: fileName,
-                image: 'https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop'
+                imageBase64: base64
             };
+            
+            console.log('📤 Saving event via V2 endpoint...');
+            
+            const response = await fetch('/api/save-event-v2', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = 'Błąd uploadingu';
+                
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.error || errorMessage;
+                } catch {
+                    errorMessage = errorText || errorMessage;
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            const result = await response.json();
+            console.log('✅ Event saved successfully:', result);
+            
+            // Dodanie do lokalnej listy z danymi z serwera
+            if (result.success && result.event) {
+                currentEvents[result.dateString] = result.event;
+            }
             
             // Odświeżenie listy
             loadExistingEvents();
             form.reset();
             document.getElementById('imagePreview').innerHTML = '';
             
-            showMessage('Wydarzenie zostało dodane do kalendarza!', 'success');
+            showMessage('Wydarzenie zostało dodane do GitHub i wkrótce pojawi się na kalendarzu!', 'success');
             
         } catch (error) {
             console.error('Błąd:', error);
@@ -175,67 +209,6 @@ function setupForm() {
             btnLoading.style.display = 'none';
         }
     });
-}
-
-// Wysłanie do GitHub (trwałe zapisywanie)
-async function uploadEventToGitHub(formData, dateString, title, description, file) {
-    try {
-        // Convert file to base64 for new endpoint
-        const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.readAsDataURL(file);
-        });
-        
-        const requestData = {
-            date: dateString,
-            title: title,
-            description: description,
-            imageBase64: base64
-        };
-        
-        console.log('📤 Sending to save-event-v2...');
-        
-        const response = await fetch('/api/save-event-v2', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            let errorMessage = 'Błąd uploadingu';
-            
-            try {
-                const errorData = JSON.parse(errorText);
-                errorMessage = errorData.error || errorMessage;
-            } catch {
-                errorMessage = errorText || errorMessage;
-            }
-            
-            throw new Error(errorMessage);
-        }
-        
-        const result = await response.json();
-        
-        // Jeśli API zwróciło event z obrazem base64, zapisz to w localStorage
-        if (result.success && result.event) {
-            const tempEvents = JSON.parse(localStorage.getItem('tempEvents') || '{}');
-            tempEvents[result.dateString] = result.event;
-            localStorage.setItem('tempEvents', JSON.stringify(tempEvents));
-            
-            // Aktualizuj current events
-            currentEvents[result.dateString] = result.event;
-        }
-        
-        return result;
-        
-    } catch (error) {
-        console.error('Błąd API:', error);
-        throw error;
-    }
 }
 
 // Usuwanie wydarzenia
@@ -423,11 +396,7 @@ function addV2TestButton() {
     document.querySelector('.existing-events').appendChild(v2Btn);
 }
 
-// Dodaj przyciski po załadowaniu
+// Dodaj przycisk eksportu po załadowaniu
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        addExportButton();
-        addDebugButton();
-        addV2TestButton();
-    }, 1000);
+    setTimeout(addExportButton, 1000);
 }); 

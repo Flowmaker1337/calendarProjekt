@@ -144,6 +144,8 @@ module.exports = async function handler(req, res) {
 // Funkcja do aktualizacji script.js z nowym wydarzeniem
 function updateScriptWithEvent(scriptContent, dateString, eventData) {
     try {
+        console.log('🔍 Finding events object...');
+        
         // Znajdź początek obiektu events
         const eventsStart = scriptContent.indexOf('const events = {');
         const eventsEnd = scriptContent.indexOf('};', eventsStart) + 2;
@@ -152,13 +154,25 @@ function updateScriptWithEvent(scriptContent, dateString, eventData) {
             throw new Error('Nie można znaleźć obiektu events w script.js');
         }
         
+        console.log('✅ Events object found');
+        
         // Wyciągnij obecny obiekt events
         const eventsString = scriptContent.substring(eventsStart, eventsEnd);
-        const eventsCode = eventsString.replace('const events = ', '');
+        let eventsCode = eventsString.replace('const events = ', '');
+        
+        console.log('🔍 Parsing events object with eval...');
+        
+        // Zabezpiecz eval - sprawdź czy kod wygląda bezpiecznie
+        if (!eventsCode.trim().startsWith('{')) {
+            throw new Error('Nieprawidłowy format obiektu events');
+        }
+        
         const events = eval('(' + eventsCode + ')');
+        console.log('✅ Events parsed, current count:', Object.keys(events).length);
         
         // Dodaj nowe wydarzenie
         events[dateString] = eventData;
+        console.log('✅ New event added, new count:', Object.keys(events).length);
         
         // Wygeneruj nowy kod
         const newEventsCode = `const events = ${JSON.stringify(events, null, 4)};`;
@@ -168,10 +182,16 @@ function updateScriptWithEvent(scriptContent, dateString, eventData) {
                                 newEventsCode + 
                                 scriptContent.substring(eventsEnd);
         
+        console.log('✅ Script updated successfully');
         return newScriptContent;
         
     } catch (error) {
         console.error('❌ Błąd aktualizacji script.js:', error);
+        console.error('Error details:', {
+            message: error.message,
+            name: error.name,
+            stack: error.stack
+        });
         throw error;
     }
 }

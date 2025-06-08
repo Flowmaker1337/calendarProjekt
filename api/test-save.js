@@ -109,19 +109,19 @@ function updateScriptWithEvent(scriptContent, dateString, eventData) {
         const eventsString = scriptContent.substring(eventsStart, eventsEnd);
         let eventsCode = eventsString.replace('const events = ', '');
         
-        console.log('🔍 Cleaning events code for parsing...');
+        console.log('🔍 Raw events code:', eventsCode.substring(0, 300));
         
-        // Bezpieczne parsowanie - konwertuj JavaScript na JSON
-        // Usuń trailing comma jeśli istnieje
-        eventsCode = eventsCode.replace(/,(\s*})/g, '$1');
+        // Lepsze parsowanie - użyj eval zamiast JSON.parse dla JS object literal
+        console.log('🔍 Using eval for JavaScript object literal...');
         
-        // Zamień single quotes na double quotes (dla JSON)
-        eventsCode = eventsCode.replace(/'/g, '"');
+        // Zabezpiecz eval - sprawdź czy kod wygląda bezpiecznie
+        if (!eventsCode.match(/^{\s*['"][\w-]+['"]\s*:/)) {
+            throw new Error('Nieprawidłowy format obiektu events');
+        }
         
-        console.log('🔍 Parsing events object...');
-        console.log('Code to parse:', eventsCode.substring(0, 200) + '...');
-        
-        const events = JSON.parse(eventsCode);
+        console.log('🔍 Parsing events object with eval...');
+        const events = eval('(' + eventsCode + ')');
+        console.log('✅ Events parsed with eval, type:', typeof events);
         console.log('✅ Events parsed, current count:', Object.keys(events).length);
         
         // Dodaj nowe wydarzenie

@@ -1,3 +1,14 @@
+// Funkcja do łączenia wydarzeń z script.js i localStorage
+function mergeEventsWithLocalStorage() {
+    try {
+        const tempEvents = JSON.parse(localStorage.getItem('tempEvents') || '{}');
+        Object.assign(events, tempEvents);
+        console.log('Załadowano tymczasowe wydarzenia z localStorage:', tempEvents);
+    } catch (error) {
+        console.error('Błąd ładowania z localStorage:', error);
+    }
+}
+
 // Przykładowe wydarzenia - tutaj możesz dodać więcej
 const events = {
     '2024-06-15': {
@@ -268,6 +279,9 @@ function initScrollReveal() {
 
 // Inicjalizacja po załadowaniu strony
 document.addEventListener('DOMContentLoaded', function() {
+    // Załaduj tymczasowe wydarzenia z localStorage
+    mergeEventsWithLocalStorage();
+    
     generateAllCalendars();
     
     // Inicjalizacja scroll reveal po wygenerowaniu kalendarzy

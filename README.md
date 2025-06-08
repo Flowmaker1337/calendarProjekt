@@ -92,17 +92,40 @@ Edytuj zmienne CSS w `styles.css` i `editor-styles.css`
 ### Zmiana animacji
 Dostosuj transitions w `.cover-image` i innych klasach
 
+## 🚀 Deployment na Vercel
+
+### Wymagana konfiguracja GitHub:
+
+#### 1. GitHub Personal Access Token
+1. Idź na GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Stwórz nowy token z uprawnieniami:
+   - `repo` (pełny dostęp do repositoriów)
+   - `contents:write` (zapis plików)
+3. Skopiuj token
+
+#### 2. Konfiguracja Vercel
+1. W ustawieniach projektu Vercel → Environment Variables
+2. Dodaj zmienną: `GITHUB_TOKEN` = [twój_token]
+3. Zakres: Production, Preview, Development
+
+### Jak to działa na Vercel:
+- 📝 **Edytor** zapisuje wydarzenia do `script.js` i obrazki do `/images/events/`
+- 🔄 **Auto-commit** do GitHub po każdym nowym wydarzeniu
+- 🚀 **Auto-deploy** na Vercel po każdym commicie
+- 💾 **Trwałe przechowywanie** - wydarzenia widoczne dla wszystkich użytkowników
+
 ## 🔧 API Endpoints
 
-- `POST /api/upload-event` - Dodaj nowe wydarzenie z obrazkiem
+- `POST /api/save-event` - Zapisz nowe wydarzenie do GitHub (trwale)
+- `POST /api/upload-event` - Dodaj wydarzenie tymczasowo (localStorage)
 - `DELETE /api/delete-event/:dateString` - Usuń wydarzenie
-- `GET /uploads/:filename` - Pobierz przesłany obrazek
 
 ## ⚠️ Wymagania
 
 - Node.js 14+
 - 10MB limit rozmiaru pliku
 - Obsługiwane formaty: JPG, PNG, GIF
+- GitHub Personal Access Token (dla trwałego zapisu)
 
 ## 🐛 Rozwiązywanie Problemów
 

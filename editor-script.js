@@ -18,8 +18,19 @@ let currentEvents = {
     }
 };
 
+// Załaduj wydarzenia z localStorage (tymczasowe na Vercel)
+function loadTempEventsFromStorage() {
+    try {
+        const tempEvents = JSON.parse(localStorage.getItem('tempEvents') || '{}');
+        currentEvents = { ...currentEvents, ...tempEvents };
+    } catch (error) {
+        console.error('Błąd ładowania z localStorage:', error);
+    }
+}
+
 // Inicjalizacja po załadowaniu strony
 document.addEventListener('DOMContentLoaded', function() {
+    loadTempEventsFromStorage(); // Załaduj tymczasowe wydarzenia
     loadExistingEvents();
     setupFileUpload();
     setupForm();
@@ -135,8 +146,8 @@ function setupForm() {
         btnLoading.style.display = 'inline';
         
         try {
-            // Symulacja wysłania do serwera
-            await uploadEventToServer(formData, dateString, title, description, file);
+            // Wysłanie do GitHub via API
+            await uploadEventToGitHub(formData, dateString, title, description, file);
             
             // Dodanie do lokalnej listy
             const fileName = `event-${Date.now()}-${file.name}`;
@@ -166,19 +177,46 @@ function setupForm() {
     });
 }
 
-// Wysłanie do serwera
-async function uploadEventToServer(formData, dateString, title, description, file) {
-    const response = await fetch('/api/upload-event', {
-        method: 'POST',
-        body: formData
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Błąd uploadingu');
+// Wysłanie do GitHub (trwałe zapisywanie)
+async function uploadEventToGitHub(formData, dateString, title, description, file) {
+    try {
+        const response = await fetch('/api/save-event', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = 'Błąd uploadingu';
+            
+            try {
+                const errorData = JSON.parse(errorText);
+                errorMessage = errorData.error || errorMessage;
+            } catch {
+                errorMessage = errorText || errorMessage;
+            }
+            
+            throw new Error(errorMessage);
+        }
+        
+        const result = await response.json();
+        
+        // Jeśli API zwróciło event z obrazem base64, zapisz to w localStorage
+        if (result.success && result.event) {
+            const tempEvents = JSON.parse(localStorage.getItem('tempEvents') || '{}');
+            tempEvents[result.dateString] = result.event;
+            localStorage.setItem('tempEvents', JSON.stringify(tempEvents));
+            
+            // Aktualizuj current events
+            currentEvents[result.dateString] = result.event;
+        }
+        
+        return result;
+        
+    } catch (error) {
+        console.error('Błąd API:', error);
+        throw error;
     }
-    
-    return await response.json();
 }
 
 // Usuwanie wydarzenia

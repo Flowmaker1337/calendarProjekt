@@ -1,0 +1,409 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #000000;
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    color: white;
+    flex-shrink: 0;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.month-calendar {
+    margin: 10vh auto;
+    width: 85vw;
+    height: 85vh;
+    margin-bottom: 30%;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    transition: all 0.6s ease;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.month-calendar.reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.month-calendar.reveal:hover {
+    transform: translateY(-5px);
+}
+
+.month-calendar.left-layout {
+    flex-direction: row-reverse;
+}
+
+.month-calendar.right-layout {
+    flex-direction: row;
+}
+
+.month-header {
+    background: transparent;
+    color: white;
+    font-size: 5rem;
+    font-weight: bold;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 6px;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    padding: 0;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.calendar-container {
+    background: black;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(255,255,255,0.1);
+    overflow: visible;
+    flex: 1;
+    height: 100%;
+    min-height: 100%;
+    width: calc(100% - 130px);
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: none;
+    flex: 1;
+    min-height: 100;
+}
+
+.day-header {
+    background: #333;
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    border-bottom: 2px solid white;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+}
+
+.day-cell {
+    aspect-ratio: 1;
+    padding: 12px;
+    border: 1px solid white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: black;
+}
+
+.day-cell:hover {
+    background: #222;
+    transform: scale(1.02);
+}
+
+.day-number {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.day-cell.other-month {
+    background: #111;
+}
+
+.day-cell.other-month .day-number {
+    color: #555;
+}
+
+.day-cell.other-month:hover {
+    background: #333;
+}
+
+.day-cell.has-event:not(.has-cover-image) {
+    background: linear-gradient(135deg, #FFE082 0%, #FFB74D 100%);
+}
+
+.day-cell.has-event:not(.has-cover-image) .day-number {
+    color: #333;
+}
+
+.day-cell.has-event:not(.has-cover-image):hover {
+    background: linear-gradient(135deg, #FFD54F 0%, #FF9800 100%);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 183, 77, 0.4);
+}
+
+.day-cell.has-cover-image {
+    position: relative;
+    overflow: visible;
+    background: black;
+    z-index: 1;
+    transition: z-index 0s ease 0s;
+}
+
+.day-cell.has-cover-image:hover {
+    z-index: 9999;
+}
+
+.cover-image {
+    position: absolute;
+    top: -17px;
+    left: -20px;
+    width: calc(100% + 40px);
+    height: calc(100% + 40px);
+    object-fit: cover;
+    border-radius: 15px;
+    z-index: 1;
+    scale: 1.7;
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.day-cell.has-cover-image:hover .cover-image {
+    scale: 1.87;
+    transform: translateY(15px);
+    z-index: 9999;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+}
+
+.day-cell.has-cover-image .day-number {
+    position: relative;
+    z-index: 3;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+    font-weight: 900;
+    font-size: 1.8rem;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.day-cell.has-cover-image .event-indicator {
+    display: none;
+}
+
+.event-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: #ff4444;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    animation: slideIn 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    z-index: 1001;
+    cursor: pointer;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+    background: rgba(255,255,255,1);
+    color: #000;
+    transform: scale(1.1);
+}
+
+#modal-body {
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+#modal-text {
+    padding: 25px;
+}
+
+#modal-title {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+#modal-date {
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+#modal-description {
+    color: #555;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0;
+    }
+    
+    header {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .month-calendar {
+        width: 95vw;
+        height: 88vh;
+        margin: 5vh auto;
+        gap: 20px;
+        flex-direction: column !important;
+    }
+    
+    .month-header {
+        font-size: 3rem;
+        writing-mode: horizontal-tb;
+        text-orientation: upright;
+        letter-spacing: 4px;
+        min-width: auto;
+        height: auto;
+        padding: 20px 0;
+    }
+    
+    .calendar-container {
+        max-width: none;
+        width: 100%;
+    }
+    
+    .day-header {
+        padding: 15px 5px;
+        font-size: 1rem;
+    }
+    
+    .day-cell {
+        aspect-ratio: 1;
+        padding: 8px;
+    }
+    
+    .day-number {
+        font-size: 1.4rem;
+    }
+    
+    .event-indicator {
+        width: 10px;
+        height: 10px;
+        bottom: 8px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    #modal-text {
+        padding: 20px;
+    }
+    
+    #modal-title {
+        font-size: 1.5rem;
+    }
+} 

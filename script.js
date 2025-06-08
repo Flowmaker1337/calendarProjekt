@@ -11,61 +11,67 @@ function mergeEventsWithLocalStorage() {
 
 // Przykładowe wydarzenia - tutaj możesz dodać więcej
 const events = {
-    '2024-06-15': {
-        title: 'Święto Pierogów',
-        image: 'https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop',
-        description: 'Tradycyjne święto regionalnej kuchni. Degustacja różnorodnych pierogów z całego regionu.',
-        coverImage: 'Angel-hugs.png'
+    "2024-06-15": {
+        "title": "Święto Pierogów",
+        "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop",
+        "description": "Tradycyjne święto regionalnej kuchni. Degustacja różnorodnych pierogów z całego regionu.",
+        "coverImage": "Angel-hugs.png"
     },
-    '2024-07-04': {
-        title: 'Festiwal Muzyczny',
-        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
-        description: 'Duży festiwal muzyczny z udziałem lokalnych i zagranicznych artystów. Koncerty na świeżym powietrzu.'
+    "2024-07-04": {
+        "title": "Festiwal Muzyczny",
+        "image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+        "description": "Duży festiwal muzyczny z udziałem lokalnych i zagranicznych artystów. Koncerty na świeżym powietrzu."
     },
-    '2024-08-12': {
-        title: 'Noc Perseidów',
-        image: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=300&fit=crop',
-        description: 'Najlepszy dzień do obserwacji meteorów Perseidów. Piknik astronomiczny pod gwiazdami.'
+    "2024-08-12": {
+        "title": "Noc Perseidów",
+        "image": "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=300&fit=crop",
+        "description": "Najlepszy dzień do obserwacji meteorów Perseidów. Piknik astronomiczny pod gwiazdami."
     },
-    '2024-09-23': {
-        title: 'Równonoc Jesienna',
-        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-        description: 'Oficjalne rozpoczęcie jesieni astronomicznej. Spacer po parku z przewodnikiem przyrodniczym.'
+    "2024-09-23": {
+        "title": "Równonoc Jesienna",
+        "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+        "description": "Oficjalne rozpoczęcie jesieni astronomicznej. Spacer po parku z przewodnikiem przyrodniczym."
     },
-    '2024-10-31': {
-        title: 'Halloween',
-        image: 'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop',
-        description: 'Tradycyjne święto Halloween z kostiumami, cukierkami i straszną zabawą dla całej rodziny.'
+    "2024-10-31": {
+        "title": "Halloween",
+        "image": "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
+        "description": "Tradycyjne święto Halloween z kostiumami, cukierkami i straszną zabawą dla całej rodziny."
     },
-    '2024-12-25': {
-        title: 'Boże Narodzenie',
-        image: 'https://images.unsplash.com/photo-1512389098783-66b81f86e199?w=400&h=300&fit=crop',
-        description: 'Najważniejsze święto chrześcijan. Czas spędzany z rodziną przy świątecznym stole.'
+    "2024-12-25": {
+        "title": "Boże Narodzenie",
+        "image": "https://images.unsplash.com/photo-1512389098783-66b81f86e199?w=400&h=300&fit=crop",
+        "description": "Najważniejsze święto chrześcijan. Czas spędzany z rodziną przy świątecznym stole."
     },
-    '2025-01-01': {
-        title: 'Nowy Rok',
-        image: 'https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=400&h=300&fit=crop',
-        description: 'Powitanie Nowego Roku 2025. Fajerwerki, postanowienia noworoczne i nowe początki.'
+    "2025-01-01": {
+        "title": "Nowy Rok",
+        "image": "https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=400&h=300&fit=crop",
+        "description": "Powitanie Nowego Roku 2025. Fajerwerki, postanowienia noworoczne i nowe początki."
     },
-    '2025-02-14': {
-        title: 'Walentynki',
-        image: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&h=300&fit=crop',
-        description: 'Święto zakochanych. Romantyczne kolacje, prezenty i wyrazy miłości.'
+    "2025-02-14": {
+        "title": "Walentynki",
+        "image": "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&h=300&fit=crop",
+        "description": "Święto zakochanych. Romantyczne kolacje, prezenty i wyrazy miłości."
     },
-    '2025-03-20': {
-        title: 'Równonoc Wiosenna',
-        image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&h=300&fit=crop',
-        description: 'Oficjalne rozpoczęcie wiosny astronomicznej. Warsztat ogrodniczy dla początkujących.'
+    "2025-03-20": {
+        "title": "Równonoc Wiosenna",
+        "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&h=300&fit=crop",
+        "description": "Oficjalne rozpoczęcie wiosny astronomicznej. Warsztat ogrodniczy dla początkujących."
     },
-    '2025-04-22': {
-        title: 'Dzień Ziemi',
-        image: 'https://images.unsplash.com/photo-1569163139178-de081c9e86c5?w=400&h=300&fit=crop',
-        description: 'Światowy Dzień Ziemi. Akcje ekologiczne, sadzenie drzew i wykłady o ochronie środowiska.'
+    "2025-04-22": {
+        "title": "Dzień Ziemi",
+        "image": "https://images.unsplash.com/photo-1569163139178-de081c9e86c5?w=400&h=300&fit=crop",
+        "description": "Światowy Dzień Ziemi. Akcje ekologiczne, sadzenie drzew i wykłady o ochronie środowiska."
     },
-    '2025-05-15': {
-        title: 'Festiwal Kwiatów',
-        image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&h=300&fit=crop',
-        description: 'Wiosenny festiwal kwiatów. Pokazy florystyczne, konkursy ogrodnicze i targi roślin.'
+    "2025-05-15": {
+        "title": "Festiwal Kwiatów",
+        "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&h=300&fit=crop",
+        "description": "Wiosenny festiwal kwiatów. Pokazy florystyczne, konkursy ogrodnicze i targi roślin."
+    },
+    "2024-06-05": {
+        "title": "test",
+        "description": "test",
+        "coverImage": "images/events/event-1749406391425.png",
+        "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
     }
 };
 

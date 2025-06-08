@@ -36,7 +36,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const REPO_OWNER = 'Flowmaker1337';
 const REPO_NAME = 'calendarProjekt';
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // Włącz CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -51,8 +51,11 @@ export default async function handler(req, res) {
     }
 
     if (!GITHUB_TOKEN) {
+        console.error('❌ GITHUB_TOKEN is not configured');
         return res.status(500).json({ error: 'Brak konfiguracji GitHub token' });
     }
+    
+    console.log('✅ GITHUB_TOKEN jest skonfigurowany');
 
     try {
         // Uruchom multer middleware
@@ -127,10 +130,13 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('Błąd GitHub API:', error);
+        console.error('❌ Błąd GitHub API:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Error response:', error.response?.data);
         res.status(500).json({ 
             error: 'Błąd zapisu do GitHub',
-            details: error.message 
+            details: error.message,
+            githubError: error.response?.data?.message || 'Unknown GitHub error'
         });
     }
 }
@@ -170,7 +176,7 @@ function updateScriptWithEvent(scriptContent, dateString, eventData) {
     }
 }
 
-export const config = {
+module.exports.config = {
     api: {
         bodyParser: false,
     },

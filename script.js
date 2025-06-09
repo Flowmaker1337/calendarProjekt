@@ -84,6 +84,12 @@ const events = {
         "description": "Opis",
         "coverImage": "images/events/event-1749461397388.png",
         "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
+    },
+    "2024-06-03": {
+        "title": "Discord day one",
+        "description": "Opis",
+        "coverImage": "images/events/event-1749462262843.png",
+        "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
     }
 };
 

@@ -212,11 +212,39 @@ function setupForm() {
 }
 
 // Usuwanie wydarzenia
-function deleteEvent(dateString) {
-    if (confirm('Czy na pewno chcesz usunąć to wydarzenie?')) {
-        delete currentEvents[dateString];
-        loadExistingEvents();
-        showMessage('Wydarzenie zostało usunięte.', 'success');
+async function deleteEvent(dateString) {
+    if (confirm('Czy na pewno chcesz usunąć to wydarzenie z GitHub i kalendarza?')) {
+        try {
+            console.log('🗑️ Deleting event from GitHub:', dateString);
+            showMessage('🗑️ Usuwam wydarzenie z GitHub...', 'success');
+            
+            const response = await fetch('/api/delete-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    dateString: dateString
+                })
+            });
+            
+            const result = await response.json();
+            console.log('🗑️ Delete result:', result);
+            
+            if (response.ok && result.success) {
+                // Sukces - usuń lokalnie też
+                delete currentEvents[dateString];
+                loadExistingEvents();
+                showMessage('✅ Wydarzenie zostało usunięte z GitHub! Kalendarz zaktualizuje się za chwilę.', 'success');
+            } else {
+                console.error('Delete error:', result);
+                showMessage(`❌ Błąd usuwania: ${result.error || result.message}`, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Delete request error:', error);
+            showMessage(`❌ Błąd połączenia z API usuwania: ${error.message}`, 'error');
+        }
     }
 }
 

@@ -100,7 +100,7 @@ const events = {
     "2024-06-01": {
         "title": "test",
         "description": "test",
-        "coverImage": "images/events/event-1749473399867.png",
+        "coverImage": "images/events/event-1749473949822.png",
         "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
     }
 };

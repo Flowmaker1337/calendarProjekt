@@ -256,6 +256,143 @@ function addExportButton() {
     document.querySelector('.existing-events').appendChild(exportBtn);
 }
 
+// Deploy button dla osób nietechnicznych
+async function triggerDeploy() {
+    const deployBtn = document.getElementById('deployBtn');
+    const btnText = deployBtn.querySelector('.btn-text');
+    const btnLoading = deployBtn.querySelector('.btn-loading');
+    
+    // Pokaż loading
+    deployBtn.disabled = true;
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline';
+    
+    try {
+        console.log('🚀 Starting deployment...');
+        showMessage('🚀 Rozpoczynam deployment... To może potrwać 1-2 minuty.', 'success');
+        
+        const response = await fetch('/api/trigger-deploy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        console.log('🚀 Deploy result:', result);
+        
+        if (response.ok && result.success) {
+            // Sukces!
+            showMessage(`✅ Deployment zakończony! Nowy kalendarz: ${result.calendarUrl}`, 'success');
+            
+            // Pokaż nowe URL-e
+            showDeploymentResult(result);
+            
+        } else {
+            // Błąd
+            console.error('Deploy error:', result);
+            showMessage(`❌ Błąd deployment: ${result.error || result.message}`, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Deploy request error:', error);
+        showMessage(`❌ Błąd połączenia z deployment API: ${error.message}`, 'error');
+    } finally {
+        // Ukryj loading
+        deployBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+    }
+}
+
+// Pokaż rezultat deployment z nowymi URL-ami
+function showDeploymentResult(result) {
+    // Usuń poprzedni rezultat jeśli istnieje
+    const existingResult = document.getElementById('deploymentResult');
+    if (existingResult) {
+        existingResult.remove();
+    }
+    
+    // Stwórz nowy div z rezultatem
+    const resultDiv = document.createElement('div');
+    resultDiv.id = 'deploymentResult';
+    resultDiv.className = 'deployment-result';
+    resultDiv.innerHTML = `
+        <h3>🎉 Deployment zakończony pomyślnie!</h3>
+        <div class="url-container">
+            <p><strong>📅 Nowy kalendarz:</strong></p>
+            <a href="${result.calendarUrl}" target="_blank" class="url-link">${result.calendarUrl}</a>
+            
+            <p><strong>✏️ Nowy edytor:</strong></p>
+            <a href="${result.editorUrl}" target="_blank" class="url-link">${result.editorUrl}</a>
+            
+            <p><small>📅 ${result.timestamp}</small></p>
+        </div>
+        <button onclick="copyUrls('${result.calendarUrl}', '${result.editorUrl}')" class="copy-urls-btn">
+            📋 Skopiuj URL-e
+        </button>
+    `;
+    
+    // Dodaj CSS style
+    resultDiv.style.cssText = `
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    `;
+    
+    // Dodaj do strony
+    document.querySelector('.existing-events').appendChild(resultDiv);
+    
+    // Scroll do rezultatu
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Skopiuj URL-e do schowka
+function copyUrls(calendarUrl, editorUrl) {
+    const text = `📅 Kalendarz: ${calendarUrl}\n✏️ Edytor: ${editorUrl}`;
+    navigator.clipboard.writeText(text).then(() => {
+        showMessage('📋 URL-e skopiowane do schowka!', 'success');
+    }).catch(() => {
+        showMessage('❌ Nie udało się skopiować', 'error');
+    });
+}
+
+// Dodaj deploy button
+function addDeployButton() {
+    const deployBtn = document.createElement('button');
+    deployBtn.id = 'deployBtn';
+    deployBtn.className = 'submit-btn';
+    deployBtn.style.marginTop = '20px';
+    deployBtn.style.backgroundColor = '#FF6B35';
+    deployBtn.style.color = 'white';
+    deployBtn.onclick = triggerDeploy;
+    
+    deployBtn.innerHTML = `
+        <span class="btn-text">🚀 Zaktualizuj Kalendarz Online</span>
+        <span class="btn-loading" style="display: none;">
+            <span class="spinner"></span> Deployment w toku...
+        </span>
+    `;
+    
+    document.querySelector('.existing-events').appendChild(deployBtn);
+    
+    // Dodaj opis
+    const description = document.createElement('p');
+    description.style.cssText = `
+        font-size: 14px;
+        color: #666;
+        margin-top: 10px;
+        text-align: center;
+        font-style: italic;
+    `;
+    description.textContent = 'Użyj tego przycisku po dodaniu wydarzeń, żeby zaktualizować publiczny kalendarz';
+    document.querySelector('.existing-events').appendChild(description);
+}
+
 // Debug upload functionality
 async function debugUpload() {
     try {
@@ -396,7 +533,10 @@ function addV2TestButton() {
     document.querySelector('.existing-events').appendChild(v2Btn);
 }
 
-// Dodaj przycisk eksportu po załadowaniu
+// Dodaj przyciski po załadowaniu
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(addExportButton, 1000);
+    setTimeout(() => {
+        addExportButton();
+        addDeployButton();
+    }, 1000);
 }); 

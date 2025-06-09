@@ -90,6 +90,12 @@ const events = {
         "description": "Opis",
         "coverImage": "images/events/event-1749462942664.png",
         "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
+    },
+    "2024-06-26": {
+        "title": "Random",
+        "description": "",
+        "coverImage": "images/events/event-1749473184866.png",
+        "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
     }
 };
 

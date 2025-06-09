@@ -78,6 +78,12 @@ const events = {
         "description": "Tutaj będzie opis. Dwa - trzy zdania opisujące to niesamowite wydarzenie :) ",
         "coverImage": "images/events/event-1749461217814.png",
         "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
+    },
+    "2025-03-03": {
+        "title": "Amanda joined the discord",
+        "description": "Opis",
+        "coverImage": "images/events/event-1749461397388.png",
+        "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
     }
 };
 

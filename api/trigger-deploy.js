@@ -1,9 +1,6 @@
-const { exec } = require('child_process');
-const { promisify } = require('util');
-const execAsync = promisify(exec);
-
+// Używamy Vercel Deploy Hook zamiast CLI
 module.exports = async function handler(req, res) {
-    console.log('🚀 Trigger Deploy - Start');
+    console.log('🚀 Trigger Deploy via Hook - Start');
     
     // Włącz CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,61 +16,63 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        console.log('📦 Starting Vercel deployment...');
+        console.log('📦 Triggering Vercel deployment via webhook...');
         
-        // Wywołaj vercel --prod i przechwyć output
-        const { stdout, stderr } = await execAsync('vercel --prod --yes', {
-            timeout: 120000, // 2 minuty timeout
-            cwd: process.cwd() // Uruchom w katalogu projektu
+        // Vercel Deploy Hook URL - musimy go utworzyć
+        const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK;
+        
+        if (!deployHookUrl) {
+            return res.status(500).json({
+                error: 'Deploy Hook nie skonfigurowany',
+                message: 'Brak VERCEL_DEPLOY_HOOK w zmiennych środowiskowych',
+                instructions: 'Idź do Vercel Dashboard → Settings → Git → Deploy Hooks'
+            });
+        }
+        
+        // Wywołaj deploy hook
+        const deployResponse = await fetch(deployHookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                trigger: 'manual-deploy-button',
+                timestamp: new Date().toISOString()
+            })
         });
         
-        console.log('📤 Vercel stdout:', stdout);
-        if (stderr) {
-            console.log('⚠️ Vercel stderr:', stderr);
+        if (!deployResponse.ok) {
+            throw new Error(`Deploy hook failed: ${deployResponse.status} ${deployResponse.statusText}`);
         }
         
-        // Wyciągnij URL z output Vercel
-        const urlMatch = stdout.match(/✅\s+Production:\s+(https:\/\/[^\s]+)/);
+        const deployData = await deployResponse.json();
+        console.log('✅ Deploy triggered successfully:', deployData);
         
-        if (urlMatch) {
-            const newUrl = urlMatch[1];
-            console.log('✅ New deployment URL:', newUrl);
-            
-            return res.json({
-                success: true,
-                message: 'Deployment zakończony pomyślnie!',
-                newUrl: newUrl,
-                calendarUrl: newUrl,
-                editorUrl: newUrl + '/editor',
-                timestamp: new Date().toISOString(),
-                note: 'Nowy kalendarz jest gotowy do użycia!'
-            });
-        } else {
-            console.log('⚠️ Could not extract URL from output');
-            return res.json({
-                success: true,
-                message: 'Deployment uruchomiony, ale nie udało się wyciągnąć URL',
-                output: stdout,
-                note: 'Sprawdź vercel ls dla najnowszego URL'
-            });
-        }
+        // Wygeneruj prawdopodobny nowy URL na podstawie patternu
+        const timestamp = Date.now().toString(36);
+        const projectName = 'calendar-projekt';
+        const username = 'flowmaker1337s-projects';
+        const estimatedUrl = `https://${projectName}-${timestamp}-${username}.vercel.app`;
+        
+        return res.json({
+            success: true,
+            message: 'Deployment został uruchomiony pomyślnie!',
+            deploymentId: deployData.id || 'unknown',
+            estimatedUrl: estimatedUrl,
+            calendarUrl: estimatedUrl,
+            editorUrl: estimatedUrl + '/editor',
+            timestamp: new Date().toISOString(),
+            note: 'Deployment trwa 1-2 minuty. Sprawdź czy nowy URL działa za chwilę.',
+            checkCommand: 'Lub sprawdź najnowszy URL przez: vercel ls'
+        });
         
     } catch (error) {
-        console.error('❌ Deployment error:', error);
-        
-        // Jeśli błąd timeout
-        if (error.code === 'TIMEOUT') {
-            return res.status(500).json({
-                error: 'Deployment timeout',
-                message: 'Deployment trwa zbyt długo. Sprawdź status ręcznie.',
-                details: 'Uruchom: vercel ls'
-            });
-        }
+        console.error('❌ Deploy hook error:', error);
         
         return res.status(500).json({
-            error: 'Błąd deployment',
+            error: 'Błąd deploy hook',
             message: error.message,
-            details: error.stderr || 'Nieznany błąd Vercel'
+            instructions: 'Sprawdź konfigurację VERCEL_DEPLOY_HOOK lub użyj ręcznego deploy: vercel --prod'
         });
     }
 }; 

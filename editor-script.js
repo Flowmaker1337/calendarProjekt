@@ -269,9 +269,9 @@ async function triggerDeploy() {
     
     try {
         console.log('🚀 Starting deployment...');
-        showMessage('🚀 Rozpoczynam deployment... To może potrwać 1-2 minuty.', 'success');
+        showMessage('📋 Sprawdzam aktualny URL kalendarza...', 'success');
         
-        const response = await fetch('/api/trigger-deploy', {
+        const response = await fetch('/api/trigger-deploy-simple', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -283,7 +283,7 @@ async function triggerDeploy() {
         
         if (response.ok && result.success) {
             // Sukces!
-            showMessage(`✅ Deployment zakończony! Nowy kalendarz: ${result.calendarUrl}`, 'success');
+            showMessage(`✅ Aktualny URL: ${result.calendarUrl}`, 'success');
             
             // Pokaż nowe URL-e
             showDeploymentResult(result);
@@ -372,9 +372,9 @@ function addDeployButton() {
     deployBtn.onclick = triggerDeploy;
     
     deployBtn.innerHTML = `
-        <span class="btn-text">🚀 Zaktualizuj Kalendarz Online</span>
+        <span class="btn-text">📋 Sprawdź Aktualny URL</span>
         <span class="btn-loading" style="display: none;">
-            <span class="spinner"></span> Deployment w toku...
+            <span class="spinner"></span> Sprawdzam...
         </span>
     `;
     
@@ -389,7 +389,7 @@ function addDeployButton() {
         text-align: center;
         font-style: italic;
     `;
-    description.textContent = 'Użyj tego przycisku po dodaniu wydarzeń, żeby zaktualizować publiczny kalendarz';
+    description.textContent = 'Kliknij żeby sprawdzić aktualny URL kalendarza. Po dodaniu wydarzeń może być potrzebny nowy deployment.';
     document.querySelector('.existing-events').appendChild(description);
 }
 

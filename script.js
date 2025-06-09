@@ -72,6 +72,12 @@ const events = {
         "description": "test",
         "coverImage": "images/events/event-1749406391425.png",
         "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
+    },
+    "2025-04-26": {
+        "title": "London Meetup",
+        "description": "Tutaj będzie opis. Dwa - trzy zdania opisujące to niesamowite wydarzenie :) ",
+        "coverImage": "images/events/event-1749461217814.png",
+        "image": "https://images.unsplash.com/photo-1548261504-c092c175b2b8?w=400&h=300&fit=crop"
     }
 };
 
